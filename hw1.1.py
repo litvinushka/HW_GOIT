@@ -58,7 +58,6 @@ def sort_folder(folder_path):
 
             try:
                 normalized_filename = normalize(filename)
-                destination_filename = f"{normalized_filename}.{extension}"
 
                 destination_path = os.path.join(
                     destination_folder_path, normalized_filename)
@@ -66,6 +65,8 @@ def sort_folder(folder_path):
                 if destination_folder == 'archives':
                     shutil.unpack_archive(file_path, destination_path)
                 else:
+                    destination_filename = f"{normalized_filename}.{extension}"
+                    destination_path = os.path.join(destination_folder_path, destination_filename)
                     shutil.move(file_path, destination_path)
             except Exception as e:
                 print(f"Ошибка при обработке файла {file_path}: {e}")
