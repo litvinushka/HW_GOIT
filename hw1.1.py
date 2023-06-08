@@ -1,14 +1,25 @@
 import os
 import shutil
 import re
-import sys
+extensions = {
+    'images': {'JPEG', 'PNG', 'JPG', 'SVG'},
+    'videos': {'AVI', 'MP4', 'MOV', 'MKV'},
+    'documents': {'DOC', 'DOCX', 'TXT', 'PDF', 'XLSX', 'PPTX'},
+    'audio': {'MP3', 'OGG', 'WAV', 'AMR'},
+    'archives': {'ZIP', 'GZ', 'TAR'}
+}
+translit_dict = {
+    'а': 'a', 'б': 'b', 'в': 'v', 'г': 'g', 'д': 'd', 'е': 'e', 'ё': 'e', 'ж': 'zh', 'з': 'z', 'и': 'i', 'й': 'y',
+    'к': 'k', 'л': 'l', 'м': 'm', 'н': 'n', 'о': 'o', 'п': 'p', 'р': 'r', 'с': 's', 'т': 't', 'у': 'u', 'ф': 'f',
+    'х': 'h', 'ц': 'ts', 'ч': 'ch', 'ш': 'sh', 'щ': 'sch', 'ъ': '', 'ы': 'y', 'ь': '', 'э': 'e', 'ю': 'yu', 'я': 'ya',
+    'А': 'A', 'Б': 'B', 'В': 'V', 'Г': 'G', 'Д': 'D', 'Е': 'E', 'Ё': 'E', 'Ж': 'Zh', 'З': 'Z', 'И': 'I', 'Й': 'Y',
+    'К': 'K', 'Л': 'L', 'М': 'M', 'Н': 'N', 'О': 'O', 'П': 'P', 'Р': 'R', 'С': 'S', 'Т': 'T', 'У': 'U', 'Ф': 'F',
+    'Х': 'H', 'Ц': 'Ts', 'Ч': 'Ch', 'Ш': 'Sh', 'Щ': 'Sch', 'Ъ': '', 'Ы': 'Y', 'Ь': '', 'Э': 'E', 'Ю': 'Yu', 'Я': 'Ya'
+}
 
 
 def main():
-    if len(sys.argv) > 1:
-        folder_name = sys.argv[1]
-    else:
-        folder_name = input("Введите название папки для сортировки: ")
+    folder_name = input("Введите название папки для сортировки: ")
     folder_path = os.path.abspath(folder_name)
 
     if not os.path.exists(folder_path):
@@ -19,27 +30,10 @@ def main():
 
 
 def normalize(filename):
-    translit_dict = {
-        'а': 'a', 'б': 'b', 'в': 'v', 'г': 'g', 'д': 'd', 'е': 'e', 'ё': 'e', 'ж': 'zh', 'з': 'z', 'и': 'i', 'й': 'y',
-        'к': 'k', 'л': 'l', 'м': 'm', 'н': 'n', 'о': 'o', 'п': 'p', 'р': 'r', 'с': 's', 'т': 't', 'у': 'u', 'ф': 'f',
-        'х': 'h', 'ц': 'ts', 'ч': 'ch', 'ш': 'sh', 'щ': 'sch', 'ъ': '', 'ы': 'y', 'ь': '', 'э': 'e', 'ю': 'yu', 'я': 'ya',
-        'А': 'A', 'Б': 'B', 'В': 'V', 'Г': 'G', 'Д': 'D', 'Е': 'E', 'Ё': 'E', 'Ж': 'Zh', 'З': 'Z', 'И': 'I', 'Й': 'Y',
-        'К': 'K', 'Л': 'L', 'М': 'M', 'Н': 'N', 'О': 'O', 'П': 'P', 'Р': 'R', 'С': 'S', 'Т': 'T', 'У': 'U', 'Ф': 'F',
-        'Х': 'H', 'Ц': 'Ts', 'Ч': 'Ch', 'Ш': 'Sh', 'Щ': 'Sch', 'Ъ': '', 'Ы': 'Y', 'Ь': '', 'Э': 'E', 'Ю': 'Yu', 'Я': 'Ya'
-    }
-
     return re.sub(r'[^\w\s.-]', '_', ''.join(translit_dict.get(c, c) for c in filename))
 
 
 def sort_folder(folder_path):
-    extensions = {
-        'images': {'JPEG', 'PNG', 'JPG', 'SVG'},
-        'videos': {'AVI', 'MP4', 'MOV', 'MKV'},
-        'documents': {'DOC', 'DOCX', 'TXT', 'PDF', 'XLSX', 'PPTX'},
-        'audio': {'MP3', 'OGG', 'WAV', 'AMR'},
-        'archives': {'ZIP', 'GZ', 'TAR'}
-    }
-
     unknown_folder = 'unknown'
 
     for root, dirs, files in os.walk(folder_path):
@@ -70,7 +64,8 @@ def sort_folder(folder_path):
                     shutil.unpack_archive(file_path, destination_path)
                 else:
                     destination_filename = f"{normalized_filename}.{extension}"
-                    destination_path = os.path.join(destination_folder_path, destination_filename)
+                    destination_path = os.path.join(
+                        destination_folder_path, destination_filename)
                     shutil.move(file_path, destination_path)
             except Exception as e:
                 print(f"Ошибка при обработке файла {file_path}: {e}")
@@ -94,13 +89,6 @@ def list_files_in_folder(folder_path):
 
 
 def list_known_extensions():
-    extensions = {
-        'images': {'JPEG', 'PNG', 'JPG', 'SVG'},
-        'videos': {'AVI', 'MP4', 'MOV', 'MKV'},
-        'documents': {'DOC', 'DOCX', 'TXT', 'PDF', 'XLSX', 'PPTX'},
-        'audio': {'MP3', 'OGG', 'WAV', 'AMR'},
-        'archives': {'ZIP', 'GZ', 'TAR'}
-    }
 
     known_extensions = {ext for ext_list in extensions.values()
                         for ext in ext_list}
@@ -109,13 +97,6 @@ def list_known_extensions():
 
 
 def list_unknown_extensions(folder_path):
-    extensions = {
-        'images': {'JPEG', 'PNG', 'JPG', 'SVG'},
-        'videos': {'AVI', 'MP4', 'MOV', 'MKV'},
-        'documents': {'DOC', 'DOCX', 'TXT', 'PDF', 'XLSX', 'PPTX'},
-        'audio': {'MP3', 'OGG', 'WAV', 'AMR'},
-        'archives': {'ZIP', 'GZ', 'TAR'}
-    }
 
     known_extensions = {ext for ext_list in extensions.values()
                         for ext in ext_list}
