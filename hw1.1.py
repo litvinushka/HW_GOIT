@@ -1,6 +1,7 @@
 import os
 import shutil
 import re
+import sys
 extensions = {
     'images': {'JPEG', 'PNG', 'JPG', 'SVG'},
     'videos': {'AVI', 'MP4', 'MOV', 'MKV'},
@@ -19,7 +20,10 @@ translit_dict = {
 
 
 def main():
-    folder_name = input("Введите название папки для сортировки: ")
+    if len(sys.argv) > 1:
+        folder_name = sys.argv[1]
+    else:
+        folder_name = input("Введите название папки для сортировки: ")
     folder_path = os.path.abspath(folder_name)
 
     if not os.path.exists(folder_path):
@@ -73,7 +77,11 @@ def sort_folder(folder_path):
                 os.remove(file_path)
             else:
                 pass
-
+    for root, dirs, files in os.walk(folder_path, topdown=False):
+        for dir in dirs:
+            dir_path = os.path.join(root, dir)
+            if not os.listdir(dir_path):
+                os.rmdir(dir_path)
     print('Сортировка завершена!')
 
 
